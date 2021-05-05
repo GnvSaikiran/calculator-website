@@ -1,50 +1,98 @@
-const buttonsContainer = document.querySelector(".base-container");
+let runningTotal = 0;
+let buffer = "0";
+let previousOperator;
+const display = document.querySelector(".display");
 
-function performAction(value) {
-  const output = document.querySelector(".display");
-  if (output.innerText === "0") {
-    output.innerText = "";
-  }
-  if (value === "←") {
-    removeDigit(output);
-  } else if (value === "C") {
-    clearScreen(output);
-  } else if (value === "=") {
-    // todo: do something here
-  } else if (value === "+") {
-    output.innerText = 0;
-  } else if (value === "-") {
-    output.innerText = 0;
-  } else if (value === "×") {
-    output.innerText = 0;
-  } else if (value === "÷") {
-    output.innerText = 0;
+function buttonClick(value) {
+  if (isNaN(parseInt(value))) {
+    handleSymbol(value);
   } else {
-    addInput(value, output);
+    handleNumber(value);
   }
+  rerender();
 }
 
-buttonsContainer.addEventListener("click", function (e) {
-  if (e.target.tagName === "BUTTON") {
-    performAction(e.target.innerText);
-  }
-  e.stopPropagation();
-});
-
-function clearScreen(output) {
-  output.innerText = "0";
-}
-
-function removeDigit(output) {
-  let value = output.innerText;
-  if (value === "0") return;
-  else if (value.length === 1) {
-    output.innerText = "0";
+function handleNumber(value) {
+  if (buffer === "0") {
+    buffer = value;
   } else {
-    output.innerText = value.substring(0, value.length - 1);
+    buffer += value;
   }
 }
 
-function addInput(value, output) {
-  output.innerText += value;
+function flushOperation(intBuffer) {
+  if (previousOperator === "+") {
+    runningTotal += intBuffer;
+  } else if (previousOperator === "-") {
+    runningTotal -= intBuffer;
+  } else if (previousOperator === "×") {
+    runningTotal *= intBuffer;
+  } else {
+    runningTotal /= intBuffer;
+  }
 }
+
+function handleSymbol(value) {
+  switch (value) {
+    case "C":
+      buffer = "0";
+      runningTotal = 0;
+      break;
+    case "=":
+      if (previousOperator === null) {
+        // need two numbers to do math
+        return;
+      }
+      flushOperation(parseInt(buffer));
+      previousOperator = null;
+      buffer = +runningTotal;
+      runningTotal = 0;
+      break;
+    case "←":
+      if (buffer.length === 1) {
+        buffer = "0";
+      } else {
+        buffer = buffer.substring(0, buffer.length - 1);
+      }
+      break;
+    case "+":
+    case "-":
+    case "×":
+    case "÷":
+      handleMath(value);
+      break;
+  }
+}
+
+function handleMath(value) {
+  if (buffer === "0") {
+    // do nothing
+    return;
+  }
+
+  const intBuffer = parseInt(buffer);
+  if (runningTotal === 0) {
+    runningTotal = intBuffer;
+  } else {
+    flushOperation(intBuffer);
+  }
+
+  previousOperator = value;
+  buffer = "0";
+}
+
+function rerender() {
+  display.innerText = buffer;
+}
+
+function init() {
+  document
+    .querySelector(".base-container")
+    .addEventListener("click", function (event) {
+      if ((event.target.tagName = "BUTTON")) {
+        buttonClick(event.target.innerText);
+      }
+    });
+}
+
+init();
