@@ -24,6 +24,7 @@
   background-color: #d8d9e2;
   font-size: 40px;
   cursor: pointer;
+  border-radius: 0;
 }
 
 .calc-button:hover {
