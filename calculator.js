@@ -2,14 +2,16 @@ const buttonsContainer = document.querySelector(".base-container");
 
 function performAction(value) {
   const output = document.querySelector(".display");
+  if (output.innerText === "0") {
+    output.innerText = "";
+  }
   if (value === "←") {
-    removeCharacter(output);
+    removeDigit(output);
   } else if (value === "C") {
     clearScreen(output);
   } else if (value === "=") {
     // todo: do something here
   } else if (value === "+") {
-    const number = parseInt(output.innerText);
     output.innerText = 0;
   } else if (value === "-") {
     output.innerText = 0;
@@ -30,13 +32,15 @@ buttonsContainer.addEventListener("click", function (e) {
 });
 
 function clearScreen(output) {
-  output.innerText = "";
+  output.innerText = "0";
 }
 
-function removeCharacter(output) {
+function removeDigit(output) {
   let value = output.innerText;
-  if (value === "") return;
-  else {
+  if (value === "0") return;
+  else if (value.length === 1) {
+    output.innerText = "0";
+  } else {
     output.innerText = value.substring(0, value.length - 1);
   }
 }
