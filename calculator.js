@@ -45,7 +45,7 @@ function handleSymbol(value) {
       }
       flushOperation(parseInt(buffer));
       previousOperator = null;
-      buffer = +runningTotal;
+      buffer = "" + runningTotal;
       runningTotal = 0;
       break;
     case "←":
@@ -66,7 +66,6 @@ function handleSymbol(value) {
 
 function handleMath(value) {
   if (buffer === "0") {
-    // do nothing
     return;
   }
 
@@ -85,14 +84,11 @@ function rerender() {
   display.innerText = buffer;
 }
 
-function init() {
-  document
-    .querySelector(".base-container")
-    .addEventListener("click", function (event) {
-      if ((event.target.tagName = "BUTTON")) {
-        buttonClick(event.target.innerText);
-      }
-    });
-}
-
-init();
+document
+  .querySelector(".base-container")
+  .addEventListener("click", function (event) {
+    if ((event.target.tagName = "BUTTON")) {
+      buttonClick(event.target.innerText);
+    }
+    event.stopPropagation();
+  });
